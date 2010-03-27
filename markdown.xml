@@ -1,0 +1,266 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd"><!--
+  Markdown mode for jEdit by Ali Rantakari (http://hasseg.org)
+  Last edited: April 23, 2009.
+
+  - Markdown home: http://daringfireball.net/projects/markdown/
+-->
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="tabSize" VALUE="4" />
+    <PROPERTY NAME="indentSize" VALUE="4" />
+    <PROPERTY NAME="maxLineLen" VALUE="120" />
+  </PROPS>
+
+  <!--
+  First we handle block level html.
+
+  The only restrictions are that block-level HTML elements — e.g. <div>, <table>, <pre>, <p>, etc. — must be separated
+  from surrounding content by blank lines, and the start and end tags of the block should not be indented with tabs or
+  spaces. Note that Markdown formatting syntax is not processed within block-level HTML tags. E.g., you can’t use
+  Markdown-style *emphasis* inside an HTML block.
+  -->
+  <RULES IGNORE_CASE="TRUE">
+
+    <!-- SGML comment -->
+    <SPAN TYPE="COMMENT1">
+      <BEGIN>&lt;!--</BEGIN>
+      <END>--&gt;</END>
+    </SPAN>
+
+    <!-- JavaScript -->
+    <SPAN HASH_CHAR="&lt;" AT_LINE_START="TRUE" TYPE="MARKUP" DELEGATE="html::JAVASCRIPT">
+      <BEGIN>&lt;script</BEGIN>
+      <END>&lt;/script&gt;</END>
+    </SPAN>
+
+    <!-- special hr case -->
+    <SEQ_REGEXP AT_LINE_START="TRUE" TYPE="MARKUP">&lt;hr\b([^&lt;&gt;])*?/?&gt;</SEQ_REGEXP>
+
+    <SPAN_REGEXP HASH_CHAR="&lt;" AT_LINE_START="TRUE" TYPE="MARKUP" DELEGATE="BLOCK_TAGS">
+      <BEGIN>&lt;(p|div|h[1-6]|blockquote|pre|table|dl|ol|ul|noscript|form|fieldset|iframe|math|ins|del)\b</BEGIN>
+      <END>&lt;/$1&gt;</END>
+    </SPAN_REGEXP>
+
+    <!-- any other tag that matches html keyword and indented 4 spaces or one tab is golden -->
+   <!-- markup tags -->
+    <IMPORT DELEGATE="MARKDOWN" />
+  </RULES>
+
+  <!-- Rules for Block level html only -->
+  <RULES SET="BLOCK_TAGS" DEFAULT="MARKUP">
+
+  <!-- any line indented less than 4 spaces is not valid markdown in block html -->
+    <EOL_SPAN_REGEXP AT_LINE_START="TRUE" TYPE="INVALID">[\S]+</EOL_SPAN_REGEXP>
+    <EOL_SPAN_REGEXP AT_LINE_START="TRUE" TYPE="INVALID"> {1,3}[\S]+</EOL_SPAN_REGEXP>
+    <EOL_SPAN_REGEXP AT_LINE_START="TRUE" DELEGATE="html::MAIN">( {4}|\t)</EOL_SPAN_REGEXP>
+
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <SEQ TYPE="OPERATOR">=</SEQ>
+  </RULES>
+
+  <RULES SET="TAGS">
+<!-- Inline CSS -->
+    <SPAN_REGEXP AT_WORD_START="TRUE" TYPE="MARKUP" DELEGATE="css::PROPERTIES" HASH_CHAR="style">
+      <BEGIN>style\s*=\s*(["'])</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+
+    <!-- Javascript: delegate on* attributes to Javascript mode -->
+    <SPAN_REGEXP AT_WORD_START="TRUE" DELEGATE="javascript::MAIN" HASH_CHAR="on" TYPE="MARKUP">
+      <BEGIN>on[a-z]+\s*=\s*(["'])</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+
+    <!-- NOTE: no ESCAPE for quotes, at least for attributes; e.g onclick="alert(\"foo\");" is invalid! -->
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>"</BEGIN>
+      <END>"</END>
+    </SPAN>
+    <SPAN TYPE="LITERAL1">
+      <BEGIN>'</BEGIN>
+      <END>'</END>
+    </SPAN>
+
+    <SEQ TYPE="OPERATOR">=</SEQ>
+
+    <KEYWORDS>
+      <!-- HTML/XHTML elements, taken from http://de.selfhtml.org/html/referenz/elemente.htm -->
+      <MARKUP>a</MARKUP>
+      <MARKUP>abbr</MARKUP>
+      <MARKUP>acronym</MARKUP>
+      <MARKUP>address</MARKUP>
+      <MARKUP>applet</MARKUP>
+      <MARKUP>area</MARKUP>
+      <MARKUP>b</MARKUP>
+      <MARKUP>base</MARKUP>
+      <MARKUP>basefont</MARKUP>
+      <MARKUP>bdo</MARKUP>
+      <MARKUP>big</MARKUP>
+      <MARKUP>blockquote</MARKUP>
+      <MARKUP>body</MARKUP>
+      <MARKUP>br</MARKUP>
+      <MARKUP>button</MARKUP>
+      <MARKUP>caption</MARKUP>
+      <MARKUP>center</MARKUP>
+      <MARKUP>cite</MARKUP>
+      <MARKUP>code</MARKUP>
+      <MARKUP>col</MARKUP>
+      <MARKUP>colgroup</MARKUP>
+      <MARKUP>dd</MARKUP>
+      <MARKUP>del</MARKUP>
+      <MARKUP>dfn</MARKUP>
+      <MARKUP>dir</MARKUP>
+      <MARKUP>div</MARKUP>
+      <MARKUP>dl</MARKUP>
+      <MARKUP>dt</MARKUP>
+      <MARKUP>em</MARKUP>
+      <MARKUP>fieldset</MARKUP>
+      <MARKUP>font</MARKUP>
+      <MARKUP>form</MARKUP>
+      <MARKUP>frame</MARKUP>
+      <MARKUP>frameset</MARKUP>
+      <MARKUP>h1</MARKUP>
+      <MARKUP>h2</MARKUP>
+      <MARKUP>h3</MARKUP>
+      <MARKUP>h4</MARKUP>
+      <MARKUP>h5</MARKUP>
+      <MARKUP>h6</MARKUP>
+      <MARKUP>head</MARKUP>
+      <MARKUP>hr</MARKUP>
+      <MARKUP>html</MARKUP>
+      <MARKUP>i</MARKUP>
+      <MARKUP>iframe</MARKUP>
+      <MARKUP>img</MARKUP>
+      <MARKUP>input</MARKUP>
+      <MARKUP>ins</MARKUP>
+      <MARKUP>isindex</MARKUP>
+      <MARKUP>kbd</MARKUP>
+      <MARKUP>label</MARKUP>
+      <MARKUP>legend</MARKUP>
+      <MARKUP>li</MARKUP>
+      <MARKUP>link</MARKUP>
+      <MARKUP>map</MARKUP>
+      <MARKUP>menu</MARKUP>
+      <MARKUP>meta</MARKUP>
+      <MARKUP>noframes</MARKUP>
+      <MARKUP>noscript</MARKUP>
+      <MARKUP>object</MARKUP>
+      <MARKUP>ol</MARKUP>
+      <MARKUP>optgroup</MARKUP>
+      <MARKUP>option</MARKUP>
+      <MARKUP>p</MARKUP>
+      <MARKUP>param</MARKUP>
+      <MARKUP>pre</MARKUP>
+      <MARKUP>q</MARKUP>
+      <MARKUP>s</MARKUP>
+      <MARKUP>samp</MARKUP>
+      <MARKUP>script</MARKUP>
+      <MARKUP>select</MARKUP>
+      <MARKUP>small</MARKUP>
+      <MARKUP>span</MARKUP>
+      <MARKUP>strike</MARKUP>
+      <MARKUP>strong</MARKUP>
+      <MARKUP>style</MARKUP>
+      <MARKUP>sub</MARKUP>
+      <MARKUP>sup</MARKUP>
+      <MARKUP>table</MARKUP>
+      <MARKUP>tbody</MARKUP>
+      <MARKUP>td</MARKUP>
+      <MARKUP>textarea</MARKUP>
+      <MARKUP>tfoot</MARKUP>
+      <MARKUP>th</MARKUP>
+      <MARKUP>thead</MARKUP>
+      <MARKUP>title</MARKUP>
+      <MARKUP>tr</MARKUP>
+      <MARKUP>tt</MARKUP>
+      <MARKUP>u</MARKUP>
+      <MARKUP>ul</MARKUP>
+      <MARKUP>var</MARKUP>
+    </KEYWORDS>
+<!--
+    <SEQ TYPE="MARKUP" DELEGATE="html::MAIN">&gt;</SEQ> -->
+
+<IMPORT DELEGATE="html::MAIN" />
+  </RULES>
+
+  <RULES SET="NULL" DEFAULT="NULL">
+  </RULES>
+
+  <RULES SET="MARKDOWN" IGNORE_CASE="FALSE">
+
+<!-- literal characters (i.e. cases where they won't
+         specify formatting)
+    -->
+    <SEQ TYPE="NULL"> * </SEQ>
+    <SEQ TYPE="NULL"> _ </SEQ>
+    <SEQ TYPE="NULL">\][</SEQ>
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[*_\\`\[\]\(\)\{\}#+-.!]</SEQ_REGEXP>
+
+    <!-- inline code: `NSString* str = @"hi!";` -->
+    <SPAN_REGEXP TYPE="LITERAL1" HASH_CHARS="`">
+      <BEGIN>(`{1,2})</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+
+     <!--
+    headers (setext-style:)      header text
+                                      ==============
+    -->
+
+    <!-- TODO: accept header text on previous line (how to match this? the
+               regexp matchers can't cross line breaks)
+    -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_LINE_START="TRUE" HASH_CHAR="=">[=-]+</EOL_SPAN_REGEXP>
+    <!-- headers (atx-style:)         ## header text
+    -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" AT_LINE_START="TRUE" HASH_CHAR="#">#{1,6}[^#]</EOL_SPAN_REGEXP>
+
+
+    <!-- horizontal rules -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD1" HASH_CHARS="-*_" AT_LINE_START="TRUE">(\s*[-_*]+\s*){3,}[-*_\s]*$</EOL_SPAN_REGEXP>
+
+
+    <!-- lists (unordered) -->
+    <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="*+- &#09;">\s{0,3}[*+-]\s+</SEQ_REGEXP>
+    <!-- lists (ordered) -->
+    <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="0123456789 &#09;">\s{0,3}\d+\.\s+</SEQ_REGEXP>
+
+
+    <!-- link or image reference definition -->
+    <!-- TODO: accept link's title attribute on the next line (how to match
+               this? the regexp matchers can't cross line breaks)
+    -->
+    <EOL_SPAN_REGEXP TYPE="KEYWORD4" HASH_CHARS=" [" AT_LINE_START="TRUE">\s{0,3}\[.*?\]:\s+</EOL_SPAN_REGEXP>
+    <!-- links or images (inline or reference) -->
+    <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHARS="![">!?\[</SEQ_REGEXP>
+    <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHARS="]">\]\s*[\(\[].*?[\)\]]</SEQ_REGEXP>
+
+
+
+    <!-- emphasis (strong) -->
+    <SPAN_REGEXP TYPE="MARKUP" HASH_CHARS="*_">
+      <BEGIN>(\*\*|__)</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+    <!-- emphasis (em) -->
+    <SPAN_REGEXP TYPE="LITERAL4" HASH_CHARS="*_">
+      <BEGIN>(\*|_)</BEGIN>
+      <END>$1</END>
+    </SPAN_REGEXP>
+
+
+    <!-- blockquote start character -->
+    <SEQ TYPE="LITERAL2" HASH_CHARS="&gt;" AT_LINE_START="TRUE">&gt;</SEQ>
+
+  </RULES>
+
+</MODE>
