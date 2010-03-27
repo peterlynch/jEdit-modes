@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!DOCTYPE MODE SYSTEM "xmode.dtd">
+
+<!--
+This file from the xilize source. it contains many xilize custom highlighting which I need to remove.
+
+This file goes in a jEdit "modes" subdirectory.  Add the following line to
+the catalog file in that directory:
+
+<MODE NAME="textile" FILE="textile.xml" FILE_NAME_GLOB="*.textile" />
+-->
+
+<MODE>
+  <PROPS>
+    <PROPERTY NAME="noTabs" VALUE="true"/>
+    <PROPERTY NAME="wrap" VALUE="soft"/>
+    <PROPERTY NAME="folding" VALUE="explicit"/>
+    <PROPERTY NAME="noTabs" VALUE="true"/>
+    <PROPERTY NAME="tabSize" VALUE="2"/>
+    <PROPERTY NAME="indentSize" VALUE="2"/>
+    <PROPERTY NAME="wrap" VALUE="soft"/>
+    <PROPERTY NAME="lineComment" VALUE=">xil>" />
+    <PROPERTY NAME="commentStart" VALUE="&lt;!--" />
+    <PROPERTY NAME="commentEnd" VALUE="--&gt;" />
+  </PROPS>
+
+  <RULES IGNORE_CASE="FALSE">
+
+    <EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="COMMENT1">&gt;xil&gt;</EOL_SPAN>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">///</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">==</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">XILIZE_STOP</SEQ>
+
+    <!-- these do not take modifiers -->
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">include.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">includex.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">define.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">script.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">ifdef.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">ifndef.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">undef.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">propfile.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">divEnd.</SEQ>
+
+    <!-- new material -->
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">defadd.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">km.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">if.</SEQ>
+    <SEQ AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">raw.</SEQ>
+    <SEQ_REGEXP HASH_CHAR="d" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">div((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="s" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">signature((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+
+    <!-- xilize comment -->
+    <EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="COMMENT2">xilcom.</EOL_SPAN>
+    <SPAN_REGEXP HASH_CHAR="x" AT_WHITESPACE_END="TRUE" TYPE="COMMENT2">
+      <BEGIN>xilcom\.\s*\{\{</BEGIN>
+      <END>}}</END>
+    </SPAN_REGEXP>
+
+    <!-- xml comment -->
+    <EOL_SPAN AT_WHITESPACE_END="TRUE" TYPE="COMMENT3" DELEGATE="xilcom_markup">xmlcom.</EOL_SPAN>
+    <SPAN_REGEXP HASH_CHAR="x" AT_WHITESPACE_END="TRUE" TYPE="COMMENT3" DELEGATE="xilcom_markup" >
+      <BEGIN>xmlcom\.\s*\{\{</BEGIN>
+      <END>}}</END>
+    </SPAN_REGEXP>
+
+    <!-- end new material, except for new rule element below -->
+
+    <SEQ_REGEXP HASH_CHAR="c" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">clear[&lt;&gt;]?\.</SEQ_REGEXP>
+
+    <SEQ_REGEXP HASH_CHAR="*" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">\*{1,}((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[^\}]+?\}|\{\{[\S ]+?\}\})+)? </SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="#" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">#{1,}((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[^\}]+?\}|\{\{[\S ]+?\}\})+)? </SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="|" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">\|(((\\\d+)|(/\d+)|_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[^\}]+?\}|\{\{[\S ]+?\}\})+\.)? </SEQ_REGEXP>
+
+    <SEQ_REGEXP HASH_CHAR="b" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">b(q|c|cx)((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[^\}]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="p" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">(p|pre|prex)((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="t" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">table((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="h" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">h([1-3]|r)((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="h" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD2">h[4-6]((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="f" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">fn[\d+]((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="d" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">dl((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.|\.\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="t" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">toc((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="x" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">xilize((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="d" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">divStart((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.)</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="b" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD1">body((-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?(\.)</SEQ_REGEXP>
+
+    <SEQ_REGEXP HASH_CHAR="(" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR=")" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="{" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="}" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="&lt;" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="&gt;" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="=" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="^" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="-" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="~" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+    <SEQ_REGEXP HASH_CHAR="_" AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3">((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\})+)(\*|#|\|)((_|-|\^|=|~|&lt;|&gt;|\(+|\)+|\(((\w+(#\w+)?)|(#\w+))\)|\{[\S ]+?\}|\{\{[\S ]+?\}\})+)?</SEQ_REGEXP>
+
+    <TERMINATE AT_CHAR="20" />
+  </RULES>
+
+  <RULES SET="UNKIND_CHAR" DEFAULT="MARKUP">
+    <SPAN TYPE="KEYWORD1">
+      <BEGIN>&amp;{</BEGIN>
+      <END>}</END>
+    </SPAN>
+    <SPAN TYPE="KEYWORD4">
+      <BEGIN>${</BEGIN>
+      <END>}</END>
+    </SPAN>
+  </RULES>
+
+  <RULES SET="xilcom_markup" DEFAULT="COMMENT3">
+    <SPAN TYPE="KEYWORD1">
+      <BEGIN>&amp;{</BEGIN>
+      <END>}</END>
+    </SPAN>
+    <SPAN TYPE="KEYWORD2">
+      <BEGIN>${</BEGIN>
+      <END>}</END>
+    </SPAN>
+  </RULES>
+
+</MODE>
