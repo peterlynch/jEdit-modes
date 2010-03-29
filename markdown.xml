@@ -122,11 +122,45 @@
     <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="+-* &#09;">[ \t]{0,}[*+-][ \t]+</SEQ_REGEXP>
     <!-- lists (ordered) -->
     <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="0123456789 &#09;">[ \t]{0,}\d+\.[ \t]+</SEQ_REGEXP>
+
     <!-- link or image reference definition -->
-    <EOL_SPAN_REGEXP TYPE="KEYWORD4" HASH_CHARS=" [" AT_LINE_START="TRUE">\s{0,3}\[.*?\]:\s+</EOL_SPAN_REGEXP>
+    <!--
+    Links All:
+    * use square brackets to delimit the text you want to turn into a link(link text).
+    * Link names may contain letters, numbers and spaces, but are not case sensitive
+    Links Inline:
+    * use parentheses immediately after the link text.
+    * Optionally, you may include a title attribute nested in the link parentheses
+      surrounded by double quotes or parenthesis
+    Links Reference Pointer [Google][1] :
+
+    Links Reference Definition [1]: http://google.com/ "Google" :
+    * title is optional
+
+    -->
+    <!-- [ ]{0,3}\[(.+)\]:[ \t]* -->
+    <MARK_FOLLOWING TYPE="KEYWORD4" MATCH_TYPE="OPERATOR">[</MARK_FOLLOWING>
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <!-- <SEQ_REGEXP TYPE="KEYWORD4">(https?|ftp):[^'"&gt;\s]+</SEQ_REGEXP> -->
+    <!-- this works, except it would be nice to get quotes and parens marked as operators -->
+    <!-- <EOL_SPAN_REGEXP AT_LINE_START="FALSE" MATCH_TYPE="INVALID" TYPE="INVALID">(https?|ftp):[^'"&gt;\s]+[ \t]*(?:(?&lt;=\s)["(](.+?)[")][ \t]*)?</EOL_SPAN_REGEXP> -->
+
+    <SPAN_REGEXP NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" MATCH_TYPE="KEYWORD4" TYPE="INVALID" DELEGATE="LINK_REF_DEF">
+      <BEGIN>(https?|ftp):[^'"&gt;\s]+</BEGIN>
+      <END>[ \t]+["|\)]+</END>
+    </SPAN_REGEXP>
+
+    <!-- <EOL_SPAN_REGEXP TYPE="KEYWORD4" HASH_CHARS=" [" AT_LINE_START="TRUE">\s{0,3}\[[\d]*?\]\:\s+</EOL_SPAN_REGEXP> -->
     <!-- links or images (inline or reference) -->
+
+    <!-- <SEQ_REGEXP TYPE="KEYWORD3" HASHCHARS="![">(?>[^\[\]]+|\[(??$0)\])*</SEQ_REGEXP> -->
+
+
+    <!--
     <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHARS="![">!?\[</SEQ_REGEXP>
     <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHARS="]">\]\s*[\(\[].*?[\)\]]</SEQ_REGEXP>
+    -->
+
     <!-- emphasis (strong) -->
     <SPAN_REGEXP TYPE="LITERAL3" HASH_CHARS="*_">
       <BEGIN>(\*\*|__)</BEGIN>
@@ -138,6 +172,14 @@
       <END>$1</END>
     </SPAN_REGEXP>
   </RULES>
+
+  <RULES DEFAULT="KEYWORD4" SET="LINK_REF_DEF">
+    <MARK_FOLLOWING TYPE="KEYWORD4" MATCH_TYPE="OPERATOR">"</MARK_FOLLOWING>
+    <SEQ TYPE="OPERATOR">"</SEQ>
+    <MARK_FOLLOWING TYPE="KEYWORD4" MATCH_TYPE="OPERATOR">(</MARK_FOLLOWING>
+    <SEQ TYPE="OPERATOR">)</SEQ>
+  </RULES>
+
 
   <!-- ================ MARKDOWN EMBEDDED IN A BLOCKQUOTE  ================================= -->
    <!--
