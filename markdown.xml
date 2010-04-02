@@ -10,7 +10,9 @@
   * determining difference between block quotes and list paragraphs
   * link's title attribute on the next line (how to match this? the regexp matchers can't cross line breaks)
   * block level html in a blockquote still is parsed for markdown
-
+  * [ __bold__ ] ( a non inline link reference needs to have the leading bracket escaped like \[ __bold__ ]
+  * inline hyper or image links like ![This image]( /path/toimage.jpg ) that are in a paragraph but at the start of a line
+    should be indeted to color properly
   Suggested Habits to best use this syntax
   * prefix entire blockquote lines with greater than char, avoid being lazy
   * try to keep code blocks 4 spaces deep only
@@ -102,7 +104,7 @@
     <SEQ TYPE="NULL"> * </SEQ>
     <SEQ TYPE="NULL"> _ </SEQ>
     <SEQ TYPE="NULL">\][</SEQ>
-    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[*_\\`\[\]\(\)\{\}#+-.!]</SEQ_REGEXP>
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[\Q*_\`[](){}#+-.!\E]</SEQ_REGEXP>
     <!-- inline code: `NSString* str = @"hi!";` using backticks-->
     <SPAN_REGEXP TYPE="LITERAL2" HASH_CHARS="`">
       <BEGIN>(`{1,2})</BEGIN>
@@ -123,8 +125,8 @@
     <!-- lists (ordered) -->
     <SEQ_REGEXP TYPE="KEYWORD2" AT_LINE_START="TRUE" HASH_CHARS="0123456789 &#09;">[ \t]{0,}\d+\.[ \t]+</SEQ_REGEXP>
 
-    <!-- link or image reference definition -->
     <!--
+    Links or Images
     Links All:
     * use square brackets to delimit the text you want to turn into a link(link text).
     * Link names may contain letters, numbers and spaces, but are not case sensitive
@@ -133,34 +135,73 @@
     * Optionally, you may include a title attribute nested in the link parentheses
       surrounded by double quotes or parenthesis
     Links Reference Pointer [Google][1] :
-
     Links Reference Definition [1]: http://google.com/ "Google" :
     * title is optional
-
+    Images Inline:![alt text](/path/to/img.jpg "Title")
+    Images Reference Definition: [id]: /path/to/img.jpg "Title"
     -->
-    <!-- [ ]{0,3}\[(.+)\]:[ \t]* -->
-    <MARK_FOLLOWING TYPE="KEYWORD4" MATCH_TYPE="OPERATOR">[</MARK_FOLLOWING>
-    <SEQ TYPE="OPERATOR">]</SEQ>
-    <!-- <SEQ_REGEXP TYPE="KEYWORD4">(https?|ftp):[^'"&gt;\s]+</SEQ_REGEXP> -->
-    <!-- this works, except it would be nice to get quotes and parens marked as operators -->
-    <!-- <EOL_SPAN_REGEXP AT_LINE_START="FALSE" MATCH_TYPE="INVALID" TYPE="INVALID">(https?|ftp):[^'"&gt;\s]+[ \t]*(?:(?&lt;=\s)["(](.+?)[")][ \t]*)?</EOL_SPAN_REGEXP> -->
-
-    <SPAN_REGEXP NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" MATCH_TYPE="KEYWORD4" TYPE="INVALID" DELEGATE="LINK_REF_DEF">
-      <BEGIN>(https?|ftp):[^'"&gt;\s]+</BEGIN>
-      <END>[ \t]+["|\)]+</END>
-    </SPAN_REGEXP>
-
-    <!-- <EOL_SPAN_REGEXP TYPE="KEYWORD4" HASH_CHARS=" [" AT_LINE_START="TRUE">\s{0,3}\[[\d]*?\]\:\s+</EOL_SPAN_REGEXP> -->
-    <!-- links or images (inline or reference) -->
-
-    <!-- <SEQ_REGEXP TYPE="KEYWORD3" HASHCHARS="![">(?>[^\[\]]+|\[(??$0)\])*</SEQ_REGEXP> -->
+   <!-- link reference definitions relative paths -->
+    <!-- <SPAN_REGEXP NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" MATCH_TYPE="KEYWORD3" TYPE="KEYWORD3" DELEGATE="LINK_REF_DEF"> -->
+      <!-- <BEGIN>:[ \t]+/</BEGIN> -->
+      <!-- <END> </END> -->
+    <!-- </SPAN_REGEXP> -->
+     <!-- highlight all urls used in links and elsewhere-->
+    <!-- <SPAN_REGEXP NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" MATCH_TYPE="KEYWORD3" TYPE="KEYWORD4" DELEGATE="LINK_REF_DEF"> -->
+      <!-- <BEGIN>:[ \t]* </BEGIN> -->
+      <!-- <END> (https?|ftp):[^'"&gt;\s]+</END> -->
+    <!-- </SPAN_REGEXP> -->
+     <!-- link names with brackets delegate to markdown in case they are not -->
+   <!-- <SPAN NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" MATCH_TYPE="KEYWORD4" DELEGATE="MARKDOWN"> -->
+      <!-- <BEGIN>[</BEGIN> -->
+      <!-- <END>]</END> -->
+    <!-- </SPAN> -->
 
 
     <!--
-    <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHARS="![">!?\[</SEQ_REGEXP>
-    <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHARS="]">\]\s*[\(\[].*?[\)\]]</SEQ_REGEXP>
+    <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="http">(https?)\://[a-zA-Z0-9\-\.]+(\.[a-zA-Z]{2,3})*?(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*</SEQ_REGEXP>
+    <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="ftp">(ftp?)\://[a-zA-Z0-9\-\.]+(\.[a-zA-Z]{2,3})*?(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*</SEQ_REGEXP>
+    <SEQ_REGEXP TYPE="KEYWORD3" >\b([a-zA-Z0-9\-\.]*?|\.{0,1})/[a-zA-Z0-9\-\.]+/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*</SEQ_REGEXP>
     -->
+    <!-- image links and ref def -->
+    <!-- this works for all inline links, one color -->
+    <!-- <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHARS="![">!?\[(?:(\w|\s|")*?\][\(\[](\w|\s|")*?[\)\]])</SEQ_REGEXP> -->
+<!-- <EOL_SPAN_REGEXP TYPE="KEYWORD3" HASH_CHARS="[" AT_WHITESPACE_END="TRUE">\[(?:(\w|\s|")*?\][\(\[](\w|\s|")*?[\)\]])</EOL_SPAN_REGEXP> -->
 
+  <!-- Label definitions all on one line -->
+    <EOL_SPAN_REGEXP TYPE="LABEL" AT_WHITESPACE_END="TRUE" DELEGATE="LINK_LABEL_DEFINITION">\[(.*?)\]\:</EOL_SPAN_REGEXP>
+  <!-- Inline images and page links ![alt text](/path/to/img.jpg "Title for this") -->
+    <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHAR=" ![" DELEGATE="LINK_INLINE_URL_TITLE">
+      <BEGIN> !\[[\p{Alnum}\p{Blank}]*</BEGIN>
+      <END>\]</END>
+    </SPAN_REGEXP>
+  <!-- Pointer style inline links [text][label] -->
+  <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" HASH_CHAR=" [" DELEGATE="LINK_INLINE_LABEL">
+      <BEGIN> \[[\p{Alnum}\p{Blank}]*</BEGIN>
+      <END>\]</END>
+    </SPAN_REGEXP>
+
+  <!--
+<SPAN_REGEXP MATCH_TYPE="KEYWORD4" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHAR=" [" DELEGATE="LINK_INLINE_LABEL">
+      <BEGIN> \[.*?\]</BEGIN>
+      <END>\[.*?\]</END>
+    </SPAN_REGEXP>
+-->
+
+
+
+
+
+    <!-- <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="]">\]\s*[\(\[].*?[\)\]]</SEQ_REGEXP> -->
+<!-- <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="[">\[</SEQ_REGEXP> -->
+    <!--
+<SEQ_REGEXP AT_WHITESPACE_END="TRUE" TYPE="KEYWORD3" HASH_CHAR="[">\[</SEQ_REGEXP>
+    <SEQ_REGEXP TYPE="KEYWORD3" HASH_CHAR="]:">\]:</SEQ_REGEXP>
+-->
+    <!-- <SPAN NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" MATCH_TYPE="NULL" DELEGATE="MARKDOWN">
+       <BEGIN>[</BEGIN>
+       <END>]</END>
+    </SPAN>
+-->
     <!-- emphasis (strong) -->
     <SPAN_REGEXP TYPE="LITERAL3" HASH_CHARS="*_">
       <BEGIN>(\*\*|__)</BEGIN>
@@ -173,11 +214,42 @@
     </SPAN_REGEXP>
   </RULES>
 
-  <RULES DEFAULT="KEYWORD4" SET="LINK_REF_DEF">
-    <MARK_FOLLOWING TYPE="KEYWORD4" MATCH_TYPE="OPERATOR">"</MARK_FOLLOWING>
+  <RULES SET="LINK_INLINE_URL_TITLE">
+    <!-- the closing bracket -->
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <!-- span containing the url and optional title -->
+    <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHAR="(" DELEGATE="LINK_INLINE_URL_TITLE_2">
+      <BEGIN>\(</BEGIN>
+      <END>\)</END>
+    </SPAN_REGEXP>
+  </RULES>
+  <RULES DEFAULT="KEYWORD3" SET="LINK_INLINE_URL_TITLE_2">
+    <!-- the closing paren and loop back to MAIN -->
+    <EOL_SPAN TYPE="NULL" MATCH_TYPE="OPERATOR" DELEGATE="MAIN">)</EOL_SPAN>
+  </RULES>
+
+  <RULES DEFAULT="NULL" SET="LINK_INLINE_LABEL">
+  <!-- the closing bracket -->
+    <SEQ TYPE="OPERATOR">]</SEQ>
+    <!-- span containing the url and optional title -->
+    <SPAN_REGEXP TYPE="KEYWORD4" MATCH_TYPE="OPERATOR" NO_LINE_BREAK="TRUE" AT_LINE_START="FALSE" HASH_CHAR="[" DELEGATE="LINK_INLINE_LABEL_2">
+      <BEGIN>\[</BEGIN>
+      <END>\]</END>
+    </SPAN_REGEXP>
+  </RULES>
+<RULES DEFAULT="LABEL" SET="LINK_INLINE_LABEL_2">
+    <!-- the closing bracket and loop back to MAIN -->
+    <EOL_SPAN TYPE="NULL" MATCH_TYPE="OPERATOR" DELEGATE="MAIN">]</EOL_SPAN>
+
+  </RULES>
+
+
+  <RULES DEFAULT="KEYWORD3" SET="LINK_LABEL_DEFINITION">
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[*_\\`\[\]\(\)\{\}#+-.!]</SEQ_REGEXP>
     <SEQ TYPE="OPERATOR">"</SEQ>
-    <MARK_FOLLOWING TYPE="KEYWORD4" MATCH_TYPE="OPERATOR">(</MARK_FOLLOWING>
+    <SEQ TYPE="OPERATOR">(</SEQ>
     <SEQ TYPE="OPERATOR">)</SEQ>
+    <IMPORT DELEGATE="MARKDOWN" />
   </RULES>
 
 
