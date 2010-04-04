@@ -1,22 +1,26 @@
 <?xml version="1.0"?>
 <!DOCTYPE MODE SYSTEM "xmode.dtd"><!--
-  Markdown mode for jEdit by Ali Rantakari (http://hasseg.org)
-  Last edited: April 23, 2009.
 
-  - Markdown home: http://daringfireball.net/projects/markdown/
+  Markdown mode for jEdit by Peter Lynch (http://peterlynch.ca)
+  Original inspiration drawn from Ali Rantakari's jEdit mode at http://hasseg.org
+  Markdown home: http://daringfireball.net/projects/markdown/
 
-  Limitations:
-  * whereever spec requires a blank line between content, we can't detect that in a jedit mode
-  * determining difference between block quotes and list paragraphs
-  * link's title attribute on the next line (how to match this? the regexp matchers can't cross line breaks)
-  * block level html in a blockquote still is parsed for markdown
-  * [ __bold__ ] ( a non inline link reference needs to have the leading bracket escaped like \[ __bold__ ]
-  * inline hyper or image links like ![This image]( /path/toimage.jpg ) that are in a paragraph but at the start of a line
-    should be indeted to color properly
-  Suggested Habits to best use this syntax
-  * prefix entire blockquote lines with greater than char, avoid being lazy
-  * try to keep code blocks 4 spaces deep only
-  * keep list paragraphs short if you can.
+  Suggested Habits and limitations for using this syntax
+  * first rule - avoid being 'lazy' as defined in the spec. This means not indenting lines 2 - n in unordered lists and
+    similar laziness. Not being lazy gives you better syntax highlighting.
+  * prefix all blockquote lines with 'greater than' char, avoid being lazy, since jedit mode regexp
+    can't cross lines
+  * try to keep code blocks 4 spaces single tab deep only
+  * add an extra space for inline links or image links that are in a paragraph and happen to wrap to
+    start on the beginning of a line. A leading space should turn coloring on for those links
+  * brackets '[' or ']' appearing in paragraphs that are not part of a link definition should have the leding bracket escaped
+    to prevent this mode thinking you are starting a link reference
+  * block level html in a blockquote will still be parsed for markdown syntax, even though the spec says
+    markdown is not parsed for in block level html
+  * determining the difference between a code block and list paragraph indented 4 spaces(or tab) is impossible
+    so to help identify code blocks any paragraph indented four spaces is treated as such
+  * tabs are assumed to be taken as four spaces.
+  * link label definitions should start at the beginning of a line and NOT up to 3 spaces leading as allowed by the spec
 
 -->
 <MODE>
@@ -28,14 +32,7 @@
     <PROPERTY NAME="commentEnd" VALUE="--&gt;" />
   </PROPS>
 
-  <!--
-  First we handle block level html.
-
-  The only restrictions are that block-level HTML elements — e.g. <div>, <table>, <pre>, <p>, etc. — must be separated
-  from surrounding content by blank lines, and the start and end tags of the block should not be indented with tabs or
-  spaces. Note that Markdown formatting syntax is not processed within block-level HTML tags. E.g., you can’t use
-  Markdown-style *emphasis* inside an HTML block.
-  -->
+  <!-- ================ MAIN ================================= -->
   <RULES IGNORE_CASE="TRUE">
 
     <!-- HANDLE BLOCK LEVEL HTML ELEMENTS -->
@@ -59,27 +56,23 @@
     </SPAN_REGEXP>
     <!-- ignore dangling less thans to allow for things like 4 < 5 -->
     <SEQ TYPE="NULL"> &lt; </SEQ>
-
     <!-- HANDLE OTHER INLINE HTML ELEMENTS -->
-
     <SPAN TYPE="MARKUP" DELEGATE="INLINE_MARKUP">
       <BEGIN>&lt;</BEGIN>
       <END>&gt;</END>
     </SPAN>
-
-
     <!-- THE REST IS MARKDOWN -->
     <IMPORT DELEGATE="MARKDOWN" />
   </RULES>
 
+  <!-- ================ INLINE HTML ================================= -->
   <RULES SET="INLINE_MARKUP" DEFAULT="MARKUP">
     <IMPORT DELEGATE="html::TAGS" />
   </RULES>
 
-
   <!-- ================ BLOCK LEVEL HTML ================================= -->
   <RULES SET="BLOCK_HTML_TAGS" DEFAULT="MARKUP">
-  <!-- any line indented less than 4 spaces is not valid markdown in block html -->
+    <!-- any line indented less than 4 spaces is not valid markdown in block html -->
     <EOL_SPAN_REGEXP AT_LINE_START="TRUE" TYPE="INVALID">[\S]+</EOL_SPAN_REGEXP>
     <EOL_SPAN_REGEXP AT_LINE_START="TRUE" TYPE="INVALID"> {1,3}[\S]+</EOL_SPAN_REGEXP>
     <EOL_SPAN_REGEXP AT_LINE_START="TRUE" DELEGATE="html::MAIN">( {4}|\t)</EOL_SPAN_REGEXP>
@@ -98,8 +91,6 @@
   <RULES SET="MARKDOWN" IGNORE_CASE="FALSE">
     <!-- blockquotes, also handles nested blockquote chars &#09; is tab -->
     <EOL_SPAN_REGEXP HASH_CHARS=" &gt;" AT_LINE_START="TRUE" MATCH_TYPE="LITERAL3" DELEGATE="MARKDOWN_BLOCKQUOTE">[ \t]*(&gt;[ \t]{1})+</EOL_SPAN_REGEXP>
-    <!-- inline html -->
-
     <!-- literal characters (i.e. cases where they won't specify formatting)  -->
     <SEQ TYPE="NULL"> * </SEQ>
     <SEQ TYPE="NULL"> _ </SEQ>
@@ -143,6 +134,14 @@
     </SPAN_REGEXP>
   </RULES>
 
+  <!-- ================ LINK PROCESSING ================================= -->
+  <RULES DEFAULT="KEYWORD3" SET="LINK_LABEL_DEFINITION">
+    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[\Q*_\`[](){}#+.!-\E]</SEQ_REGEXP>
+    <SEQ TYPE="OPERATOR">"</SEQ>
+    <SEQ TYPE="OPERATOR">(</SEQ>
+    <SEQ TYPE="OPERATOR">)</SEQ>
+    <IMPORT DELEGATE="MARKDOWN" />
+  </RULES>
   <RULES SET="LINK_INLINE_URL_TITLE">
     <!-- the closing bracket of the link text-->
     <SEQ TYPE="OPERATOR">]</SEQ>
@@ -165,16 +164,6 @@
     <!-- the closing bracket and loop back to MAIN -->
     <EOL_SPAN TYPE="NULL" MATCH_TYPE="OPERATOR" DELEGATE="MAIN">]</EOL_SPAN>
   </RULES>
-
-
-  <RULES DEFAULT="KEYWORD3" SET="LINK_LABEL_DEFINITION">
-    <SEQ_REGEXP TYPE="NULL" HASH_CHAR="\">\\[\Q*_\`[](){}#+.!-\E]</SEQ_REGEXP>
-    <SEQ TYPE="OPERATOR">"</SEQ>
-    <SEQ TYPE="OPERATOR">(</SEQ>
-    <SEQ TYPE="OPERATOR">)</SEQ>
-    <IMPORT DELEGATE="MARKDOWN" />
-  </RULES>
-
 
   <!-- ================ MARKDOWN EMBEDDED IN A BLOCKQUOTE  ================================= -->
    <!--
