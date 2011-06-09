@@ -132,12 +132,12 @@
       <END>\]</END>
     </SPAN_REGEXP>
     <!-- emphasis (strong) -->
-    <SPAN_REGEXP TYPE="LITERAL3" HASH_CHARS="*_">
+    <SPAN_REGEXP TYPE="LITERAL3" HASH_CHARS="*_" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
       <BEGIN>(\*\*|__)</BEGIN>
       <END>$1</END>
     </SPAN_REGEXP>
     <!-- emphasis (em) -->
-    <SPAN_REGEXP TYPE="LITERAL4" HASH_CHARS="*_">
+    <SPAN_REGEXP TYPE="LITERAL4" HASH_CHARS="*_" AT_WORD_START="TRUE" NO_LINE_BREAK="TRUE">
       <BEGIN>(\*|_)</BEGIN>
       <END>$1</END>
     </SPAN_REGEXP>
